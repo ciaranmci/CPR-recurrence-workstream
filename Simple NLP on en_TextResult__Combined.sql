@@ -1418,7 +1418,7 @@ WHERE mflag_responseANDmixed = 1
 ALTER TABLE #mflag_responseANDmixed DROP COLUMN pID, en_EventDate
 end --
 
--- ** Bring it all together into #simpleNLP_Br. **
+-- ** Bring it all together into simpleNLP_Br. **
 IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'cpr' AND TABLE_NAME = 'simpleNLP_Br')) 
 BEGIN DROP TABLE simpleNLP_Br END
 SELECT unionKey AS pID, unionpID, unionts AS ts,
@@ -1541,7 +1541,7 @@ SELECT unionKey AS pID, unionpID, unionts AS ts,
 			) > 0 THEN 1
 			ELSE 0
 		END) AS notWorsenChk
-INTO #simpleNLP_Br
+INTO simpleNLP_Br
 FROM
 (
 SELECT * FROM( --t42
@@ -1840,48 +1840,48 @@ ON unionKey = t.key42
 ) t43
 -- ** Change NULL to zero. **
 begin --
-UPDATE #simpleNLP_Br SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
-UPDATE #simpleNLP_Br SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
-UPDATE #simpleNLP_Br SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
-UPDATE #simpleNLP_Br SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
-UPDATE #simpleNLP_Br SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
-UPDATE #simpleNLP_Br SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
-UPDATE #simpleNLP_Br SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
-UPDATE #simpleNLP_Br SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
-UPDATE #simpleNLP_Br SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
-UPDATE #simpleNLP_Br SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
-UPDATE #simpleNLP_Br SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
-UPDATE #simpleNLP_Br SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
-UPDATE #simpleNLP_Br SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
-UPDATE #simpleNLP_Br SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
-UPDATE #simpleNLP_Br SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
-UPDATE #simpleNLP_Br SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
-UPDATE #simpleNLP_Br SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
-UPDATE #simpleNLP_Br SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
-UPDATE #simpleNLP_Br SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
-UPDATE #simpleNLP_Br SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
-UPDATE #simpleNLP_Br SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_Br SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_Br SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
-UPDATE #simpleNLP_Br SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
-UPDATE #simpleNLP_Br SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
-UPDATE #simpleNLP_Br SET mixedChk = 0 WHERE mixedChk IS NULL
+UPDATE simpleNLP_Br SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
+UPDATE simpleNLP_Br SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
+UPDATE simpleNLP_Br SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
+UPDATE simpleNLP_Br SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
+UPDATE simpleNLP_Br SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
+UPDATE simpleNLP_Br SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
+UPDATE simpleNLP_Br SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
+UPDATE simpleNLP_Br SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
+UPDATE simpleNLP_Br SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
+UPDATE simpleNLP_Br SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
+UPDATE simpleNLP_Br SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
+UPDATE simpleNLP_Br SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
+UPDATE simpleNLP_Br SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
+UPDATE simpleNLP_Br SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
+UPDATE simpleNLP_Br SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
+UPDATE simpleNLP_Br SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
+UPDATE simpleNLP_Br SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
+UPDATE simpleNLP_Br SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
+UPDATE simpleNLP_Br SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
+UPDATE simpleNLP_Br SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
+UPDATE simpleNLP_Br SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_Br SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_Br SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
+UPDATE simpleNLP_Br SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
+UPDATE simpleNLP_Br SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
+UPDATE simpleNLP_Br SET mixedChk = 0 WHERE mixedChk IS NULL
 end --
 
 
@@ -3300,7 +3300,7 @@ WHERE mflag_responseANDmixed = 1
 ALTER TABLE #mflag_responseANDmixed DROP COLUMN pID, en_EventDate
 end --
 
--- ** Bring it all together into #simpleNLP_Ov. **
+-- ** Bring it all together into simpleNLP_Ov. **
 IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'cpr' AND TABLE_NAME = 'simpleNLP_Ov')) 
 BEGIN DROP TABLE simpleNLP_Ov END
 SELECT unionKey AS pID, unionpID, unionts AS ts,
@@ -3423,7 +3423,7 @@ SELECT unionKey AS pID, unionpID, unionts AS ts,
 			) > 0 THEN 1
 			ELSE 0
 		END) AS notWorsenChk
-INTO #simpleNLP_Ov
+INTO simpleNLP_Ov
 FROM
 (
 SELECT * FROM( --t42
@@ -3722,48 +3722,48 @@ ON unionKey = t.key42
 ) t43
 -- ** Change NULL to zero. **
 begin --
-UPDATE #simpleNLP_Ov SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
-UPDATE #simpleNLP_Ov SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
-UPDATE #simpleNLP_Ov SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
-UPDATE #simpleNLP_Ov SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
-UPDATE #simpleNLP_Ov SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
-UPDATE #simpleNLP_Ov SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
-UPDATE #simpleNLP_Ov SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
-UPDATE #simpleNLP_Ov SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
-UPDATE #simpleNLP_Ov SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
-UPDATE #simpleNLP_Ov SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
-UPDATE #simpleNLP_Ov SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
-UPDATE #simpleNLP_Ov SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
-UPDATE #simpleNLP_Ov SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
-UPDATE #simpleNLP_Ov SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
-UPDATE #simpleNLP_Ov SET mixedChk = 0 WHERE mixedChk IS NULL
+UPDATE simpleNLP_Ov SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
+UPDATE simpleNLP_Ov SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
+UPDATE simpleNLP_Ov SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
+UPDATE simpleNLP_Ov SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
+UPDATE simpleNLP_Ov SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
+UPDATE simpleNLP_Ov SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
+UPDATE simpleNLP_Ov SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
+UPDATE simpleNLP_Ov SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
+UPDATE simpleNLP_Ov SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
+UPDATE simpleNLP_Ov SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
+UPDATE simpleNLP_Ov SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
+UPDATE simpleNLP_Ov SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
+UPDATE simpleNLP_Ov SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
+UPDATE simpleNLP_Ov SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
+UPDATE simpleNLP_Ov SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
+UPDATE simpleNLP_Ov SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
+UPDATE simpleNLP_Ov SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
+UPDATE simpleNLP_Ov SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
+UPDATE simpleNLP_Ov SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
+UPDATE simpleNLP_Ov SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
+UPDATE simpleNLP_Ov SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_Ov SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_Ov SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
+UPDATE simpleNLP_Ov SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
+UPDATE simpleNLP_Ov SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
+UPDATE simpleNLP_Ov SET mixedChk = 0 WHERE mixedChk IS NULL
 end --
 
 
@@ -5186,7 +5186,7 @@ WHERE mflag_responseANDmixed = 1
 ALTER TABLE #mflag_responseANDmixed DROP COLUMN pID, en_EventDate
 end --
 
--- ** Bring it all together into #simpleNLP_CR. **
+-- ** Bring it all together into simpleNLP_CR. **
 IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'cpr' AND TABLE_NAME = 'simpleNLP_CR')) 
 BEGIN DROP TABLE simpleNLP_CR END
 SELECT unionKey AS pID, unionpID, unionts AS ts,
@@ -5309,7 +5309,7 @@ SELECT unionKey AS pID, unionpID, unionts AS ts,
 			) > 0 THEN 1
 			ELSE 0
 		END) AS notWorsenChk
-INTO #simpleNLP_CR
+INTO simpleNLP_CR
 FROM
 (
 SELECT * FROM( --t42
@@ -5608,48 +5608,48 @@ ON unionKey = t.key42
 ) t43
 -- ** Change NULL to zero. **
 begin --
-UPDATE #simpleNLP_CR SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
-UPDATE #simpleNLP_CR SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
-UPDATE #simpleNLP_CR SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
-UPDATE #simpleNLP_CR SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
-UPDATE #simpleNLP_CR SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
-UPDATE #simpleNLP_CR SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
-UPDATE #simpleNLP_CR SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
-UPDATE #simpleNLP_CR SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
-UPDATE #simpleNLP_CR SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
-UPDATE #simpleNLP_CR SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
-UPDATE #simpleNLP_CR SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
-UPDATE #simpleNLP_CR SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
-UPDATE #simpleNLP_CR SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
-UPDATE #simpleNLP_CR SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
-UPDATE #simpleNLP_CR SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
-UPDATE #simpleNLP_CR SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
-UPDATE #simpleNLP_CR SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
-UPDATE #simpleNLP_CR SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
-UPDATE #simpleNLP_CR SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
-UPDATE #simpleNLP_CR SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
-UPDATE #simpleNLP_CR SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_CR SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
-UPDATE #simpleNLP_CR SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
-UPDATE #simpleNLP_CR SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
-UPDATE #simpleNLP_CR SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
-UPDATE #simpleNLP_CR SET mixedChk = 0 WHERE mixedChk IS NULL
+UPDATE simpleNLP_CR SET wflag_metastNOTno = 0 WHERE wflag_metastNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_metastNOTrather = 0 WHERE wflag_metastNOTrather IS NULL
+UPDATE simpleNLP_CR SET wflag_metastNOTstable = 0 WHERE wflag_metastNOTstable IS NULL
+UPDATE simpleNLP_CR SET wflag_metastNOTknown = 0 WHERE wflag_metastNOTknown IS NULL
+UPDATE simpleNLP_CR SET wflag_metastNOTdecrease = 0 WHERE wflag_metastNOTdecrease IS NULL
+UPDATE simpleNLP_CR SET wflag_recurNOTno = 0 WHERE wflag_recurNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_malignanNOTunchanged = 0 WHERE wflag_malignanNOTunchanged IS NULL
+UPDATE simpleNLP_CR SET wflag_malignanNOTno = 0 WHERE wflag_malignanNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_unchangedNOTmalignan = 0 WHERE wflag_unchangedNOTmalignan IS NULL
+UPDATE simpleNLP_CR SET wflag_bulkNOTreduc = 0 WHERE wflag_bulkNOTreduc IS NULL
+UPDATE simpleNLP_CR SET wflag_bulkNOTdecrease = 0 WHERE wflag_bulkNOTdecrease IS NULL
+UPDATE simpleNLP_CR SET wflag_massNOTreduc = 0 WHERE wflag_massNOTreduc IS NULL
+UPDATE simpleNLP_CR SET wflag_massNOTdecrease = 0 WHERE wflag_massNOTdecrease IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTunchanged = 0 WHERE wflag_diseaseNOTunchanged IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTstable = 0 WHERE wflag_diseaseNOTstable IS NULL
+UPDATE simpleNLP_CR SET wflag_resolvNOTdisease = 0 WHERE wflag_resolvNOTdisease IS NULL
+UPDATE simpleNLP_CR SET wflag_stableNOTdisease = 0 WHERE wflag_stableNOTdisease IS NULL
+UPDATE simpleNLP_CR SET wflag_responseNOTdisease = 0 WHERE wflag_responseNOTdisease IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTreduc = 0 WHERE wflag_diseaseNOTreduc IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTpaget = 0 WHERE wflag_diseaseNOTpaget IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTdecrease = 0 WHERE wflag_diseaseNOTdecrease IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseNOTno = 0 WHERE wflag_diseaseNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_carcinomaNOTunchanged = 0 WHERE wflag_carcinomaNOTunchanged IS NULL
+UPDATE simpleNLP_CR SET wflag_carcinomaNOTkeeping = 0 WHERE wflag_carcinomaNOTkeeping IS NULL
+UPDATE simpleNLP_CR SET wflag_carcinomaNOTno = 0 WHERE wflag_carcinomaNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_neoplasmNOTno = 0 WHERE wflag_neoplasmNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_progressNOTno = 0 WHERE wflag_progressNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_deterioratNOTno = 0 WHERE wflag_deterioratNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_relapseNOTno = 0 WHERE wflag_relapseNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_increaseinvolumeNOTno = 0 WHERE wflag_increaseinvolumeNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_effusionNOTincreaseinsize = 0 WHERE wflag_effusionNOTincreaseinsize IS NULL
+UPDATE simpleNLP_CR SET wflag_spreadNOTno = 0 WHERE wflag_spreadNOTno IS NULL
+UPDATE simpleNLP_CR SET wflag_diseaseANDsecondary = 0 WHERE wflag_diseaseANDsecondary IS NULL
+UPDATE simpleNLP_CR SET nwflag_stableNOTnot = 0 WHERE nwflag_stableNOTnot IS NULL
+UPDATE simpleNLP_CR SET nwflag_resolvANDdisease = 0 WHERE nwflag_resolvANDdisease IS NULL
+UPDATE simpleNLP_CR SET nwflag_diseaseANDno = 0 WHERE nwflag_diseaseANDno IS NULL
+UPDATE simpleNLP_CR SET nwflag_noevidenceNOTconclusion = 0 WHERE nwflag_noevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_CR SET nwflag_nodefiniteevidenceNOTconclusion = 0 WHERE nwflag_nodefiniteevidenceNOTconclusion IS NULL
+UPDATE simpleNLP_CR SET nwflag_nomeasurableNOTno = 0 WHERE nwflag_nomeasurableNOTno IS NULL
+UPDATE simpleNLP_CR SET nwflag_responseNOTnot = 0 WHERE nwflag_responseNOTnot IS NULL
+UPDATE simpleNLP_CR SET nwflag_responseNOTno = 0 WHERE nwflag_responseNOTno IS NULL
+UPDATE simpleNLP_CR SET mixedChk = 0 WHERE mixedChk IS NULL
 end --
 
 
