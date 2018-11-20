@@ -87,7 +87,7 @@ UPDATE #consultTable_Ov SET ageBandAtConsultationDate = 17 WHERE ageBandAtConsul
 end --
 
 begin -- ** PPMQuery.leeds.Annotations **
-IF OBJECT_ID ('tempdb..#annotationTable_Ov_pre') IS NOT NULL  
+IF OBJECT_ID ('tempdb..#annotationsTable_Ov_pre') IS NOT NULL  
 	DROP TABLE #annotationsTable_Ov_pre
 CREATE TABLE #annotationsTable_Ov_pre(
 	   annotIDkey uniqueidentifier, pID int, 
