@@ -117,7 +117,7 @@ WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID = t2.pID
 ORDER BY pID, dictateDate DESC
 
-IF OBJECT_ID ('tempdb..#annotationTable_Ov') IS NOT NULL  
+IF OBJECT_ID ('tempdb..#annotationsTable_Ov') IS NOT NULL  
 	DROP TABLE #annotationsTable_Ov
 SELECT * INTO #annotationsTable_Ov
 FROM
