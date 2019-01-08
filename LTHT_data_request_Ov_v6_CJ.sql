@@ -3113,9 +3113,25 @@ ORDER BY pID, ts
 ALTER TABLE #combinedTable_Ov_pre6 DROP COLUMN rowID8
 UPDATE #combinedTable_Ov_pre6 SET treatmentBlock_chemo = 0 WHERE treatmentBlock_chemo IS NULL
 
+
+-- ** Convert the pIDs that were scrambled by A.N. back to LTHT PatientIDs for C.J. to scramble.
+IF OBJECT_ID ('tempdb..#pID_to_PatientID_tempTable') IS NOT NULL DROP TABLE #pID_to_PatientID_tempTable
+SELECT DISTINCT ex_CodedIdentifier, ex_PatientID
+INTO #pID_to_PatientID_tempTable
+FROM ACNRes.dbo.sdt_RP_BR_CR_OV_COMBINED_FLAT_TABLE_2013_FINAL
+
+IF OBJECT_ID ('tempdb..#combinedTable_CR_pre7') IS NOT NULL DROP TABLE #combinedTable_CR_pre7
+SELECT *
+INTO #combinedTable_CR_pre7
+FROM #combinedTable_CR_pre6 AS t1
+JOIN
+#pID_to_PatientID_tempTable AS t2
+ON t1.pID = t2.ex_CodedIdentifier
+ALTER TABLE #combinedTable_CR_pre7 DROP COLUMN pID, ex_CodedIdentifier
+
 end --
 -- Show final output.
---SELECT * FROM #combinedTable_Ov_pre6 ORDER BY pID, ts
+--SELECT * FROM #combinedTable_Ov_pre7 ORDER BY pID, ts
 
 -- *******************************************************************
 -- ** Create the final flat tables. **
@@ -3139,8 +3155,7 @@ SELECT * INTO oneColWorsening_Ov FROM #oneColWorsening_Ov
 SELECT * INTO recurrences_Ov FROM #recurrences_Ov
 SELECT * INTO TreatmentBlockDates_radio FROM #TreatmentBlockDates_radio
 SELECT * INTO TreatmentBlockDates_chemo FROM #TreatmentBlockDates_chemo
-SELECT * INTO combinedTable_Ov FROM #combinedTable_Ov_pre6
-SELECT * INTO #combinedTable_Ov FROM #combinedTable_Ov_pre6
+SELECT * INTO combinedTable_Ov FROM #combinedTable_Ov_pre7
 end --
 
 
