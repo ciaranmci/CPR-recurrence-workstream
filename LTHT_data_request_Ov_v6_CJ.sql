@@ -6,15 +6,14 @@ BEGIN
 -- ** Create temporary table containing Patient IDs of interest.
 -- ***************************************************************
 begin -- 
-
-DECLARE @WLovarian varchar(8) = '11003196';
+DECLARE @WLOvarian varchar(8) = '11003196';
 IF OBJECT_ID ('tempdb..#OvarianPatients') IS NOT NULL  
 	DROP TABLE #OvarianPatients;
 CREATE TABLE #OvarianPatients(pID int);
 INSERT INTO #OvarianPatients(pID)
 SELECT DISTINCT wc_PatientID OvarianWatchlistPID
 FROM PPMQuery.leeds.Watch
-WHERE wc_WatchDefinitionID like @WLovarian
+WHERE wc_WatchDefinitionID like @WLOvarian
 ORDER BY OvarianWatchlistPID;
 --SELECT * FROM #OvarianPatients;
 end--
@@ -87,7 +86,7 @@ UPDATE #consultTable_Ov SET ageBandAtConsultationDate = 17 WHERE ageBandAtConsul
 end --
 
 begin -- ** PPMQuery.leeds.Annotations **
-IF OBJECT_ID ('tempdb..#annotationsTable_Ov_pre') IS NOT NULL  
+IF OBJECT_ID ('tempdb..#annotationsTable_Ov_pre') IS NOT NULL
 	DROP TABLE #annotationsTable_Ov_pre
 CREATE TABLE #annotationsTable_Ov_pre(
 	   annotIDkey uniqueidentifier, pID int, 
@@ -136,7 +135,7 @@ UPDATE #annotationsTable_Ov SET ageBandAtDictateDate = 17 WHERE ageBandAtDictate
 --SELECT * FROM #annotationsTable_Ov
 end --
 
-begin -- **PPMQuery.leeds.Outpatients **
+begin -- ** PPMQuery.leeds.Outpatients **
 IF OBJECT_ID ('tempdb..#outpatientTable_Ov_pre') IS NOT NULL  
 	DROP TABLE #outpatientTable_Ov_pre
 CREATE TABLE #outpatientTable_Ov_pre(
@@ -912,7 +911,7 @@ FROM
 end --
 
 begin -- ** Chemotherapy **
--- ******* This is all a bit complicated because the data is all over the place.
+-- ** This is all a bit complicated because the data is all over the place.
  -- ** PPMQuery.leeds.ChemoDrugs **
  -- ** This first table has the dated chemoDrugs data - cycleStartDate. **
 IF OBJECT_ID ('tempdb..#chemoDrugsTable_Ov_chemD_time1_pre') IS NOT NULL
@@ -948,12 +947,10 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID1 = t2.pID
 ORDER BY pID, cycleStartDate DESC
-
 IF OBJECT_ID ('tempdb..#chemoDrugsTable_Ov_chemD_time1') IS NOT NULL
 	DROP TABLE #chemoDrugsTable_Ov_chemD_time1
-SELECT * INTO #chemoDrugsTable_Ov_chemD_time1
-FROM
-(SELECT * FROM #chemoDrugsTable_Ov_chemD_time1_pre) t1
+SELECT DISTINCT * INTO #chemoDrugsTable_Ov_chemD_time1
+FROM #chemoDrugsTable_Ov_chemD_time1_pre t1
 JOIN
 (SELECT DISTINCT ex_CodedIdentifier chemPID1, ex_PatientID
 FROM ACNRes.dbo.sdt_RP_BR_CR_OV_COMBINED_FLAT_TABLE_2013_FINAL
@@ -965,6 +962,12 @@ ON t1.pID1 = t2.ex_PatientID
 WHERE cycleStartDate < '2012-04-13'
 ALTER TABLE #chemoDrugsTable_Ov_chemD_time1 DROP COLUMN pID1, ex_PatientID
 UPDATE #chemoDrugsTable_Ov_chemD_time1 SET ageBandAtCycleStartDate = 17 WHERE ageBandAtCycleStartDate > 17
+-- ** The following delete statement is needed to fix an error in the data where a cycleStartDate was 
+-- ** incorrectly recorded. 
+DELETE #chemoDrugsTable_Ov_chemD_time1
+WHERE chemPID1 = '3326F0C5-75F1-43FA-94EF-8C86049AA966' AND
+		regimenID1 = '1003801674' AND cycleStartDate = '2008-01-07'
+		AND cycleNum1 = '3'
 --SELECT * FROM #chemoDrugsTable_Ov_chemD_time1 ORDER BY chemPID1, regimenID1, cycleNum1, cycleStartDate
 -- ** This second table has the dated chemoDrugs data - drugStartDate. **
 IF OBJECT_ID ('tempdb..#chemoDrugsTable_Ov_chemD_time2_pre') IS NOT NULL
@@ -1000,10 +1003,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID2 = t2.pID
 ORDER BY pID, drugStartDate DESC
-
 IF OBJECT_ID ('tempdb..#chemoDrugsTable_Ov_chemD_time2') IS NOT NULL
 	DROP TABLE #chemoDrugsTable_Ov_chemD_time2	
-SELECT * INTO #chemoDrugsTable_Ov_chemD_time2
+SELECT DISTINCT * INTO #chemoDrugsTable_Ov_chemD_time2
 FROM
 (SELECT * FROM #chemoDrugsTable_Ov_chemD_time2_pre) t1
 JOIN
@@ -1036,8 +1038,7 @@ CREATE TABLE #chemoDrugsTable_Ov_chemD_notime_pre(
 		drugDose real,
 		drugFreq nvarchar(10),
 		drugConsultantSpeciality_drug nvarchar(100),
-	   chemSurvStatus bit,
-	   chemSurvTime real)
+	   chemSurvStatus bit)
 INSERT INTO #chemoDrugsTable_Ov_chemD_notime_pre(
 		pID3,
 		heightValue,
@@ -1053,8 +1054,7 @@ INSERT INTO #chemoDrugsTable_Ov_chemD_notime_pre(
 		drugDose,
 		drugFreq,
 		drugConsultantSpeciality_drug,
-	   chemSurvStatus,
-	   chemSurvTime)
+	   chemSurvStatus)
 SELECT t1.pID3,
 		heightValue,
 		weightValue,
@@ -1069,8 +1069,7 @@ SELECT t1.pID3,
 		drugDose,
 		drugFreq,
 		drugConsultantSpeciality_drug,
-	   chemSurvStatus,
-	   chemSurvTime
+	   chemSurvStatus
 FROM
 (SELECT ecd_PatientID pID3,		
 		ecc_Height heightValue,
@@ -1086,8 +1085,7 @@ FROM
 		ecd_DrugDose drugDose,
 		ecd_Freq drugFreq,
 		ecd_DrugContactSpecialityLabel drugConsultantSpeciality_drug,
-	   ecd_SurvivalStatus chemSurvStatus,
-	   ecd_SurvivalTime chemSurvTime
+	   ecd_SurvivalStatus chemSurvStatus
 FROM PPMQuery.leeds.ChemoDrugs
 WHERE ecd_PatientID IN (SELECT * FROM #OvarianPatients)) t1
 JOIN
@@ -1097,12 +1095,10 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID3 = t2.pID
 ORDER BY pID, regimenID3, cycleNum3 DESC
-
 IF OBJECT_ID ('tempdb..#chemoDrugsTable_Ov_chemD_notime') IS NOT NULL
 	DROP TABLE #chemoDrugsTable_Ov_chemD_notime
-SELECT * INTO #chemoDrugsTable_Ov_chemD_notime
-FROM
-(SELECT * FROM #chemoDrugsTable_Ov_chemD_notime_pre) t1
+SELECT DISTINCT * INTO #chemoDrugsTable_Ov_chemD_notime
+FROM #chemoDrugsTable_Ov_chemD_notime_pre t1
 JOIN
 (SELECT DISTINCT ex_CodedIdentifier chemPID3, ex_PatientID
 FROM ACNRes.dbo.sdt_RP_BR_CR_OV_COMBINED_FLAT_TABLE_2013_FINAL
@@ -1113,7 +1109,6 @@ WHERE ex_PatientID IN (
 ON t1.pID3 = t2.ex_PatientID
 ALTER TABLE #chemoDrugsTable_Ov_chemD_notime DROP COLUMN pID3, ex_PatientID
 --SELECT * FROM #chemoDrugsTable_Ov_chemD_notime ORDER BY chemPID3, regimenID3, cycleNum3
-
 
 -- ** PPMQuery.leeds.ChemoCycles **
 -- ** This fourth table has the non-dated chemoCycles data. There is no dated information** 
@@ -1152,9 +1147,6 @@ FROM
 		ecc_MaxDays expDurationOfCycle
 FROM PPMQuery.leeds.ChemoCycles
 WHERE ecc_PatientID IN (SELECT * FROM #OvarianPatients)
-	AND ecc_RegimenLabel NOT LIKE '%OPMAS%' -- This comes from MT. He said OPMAS is and
-											-- old system and does not have reliable 
-											-- reliable information.
 	) t1
 JOIN
 (SELECT DISTINCT dx_PatientID pID,
@@ -1163,10 +1155,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID4 = t2.pID
 ORDER BY pID DESC
-
 IF OBJECT_ID ('tempdb..#chemoCycleTable_Ov_notime') IS NOT NULL
 	DROP TABLE #chemoCycleTable_Ov_notime
-SELECT * INTO #chemoCycleTable_Ov_notime
+SELECT DISTINCT * INTO #chemoCycleTable_Ov_notime
 FROM
 (SELECT * FROM #chemoCycleTable_Ov_notime_pre) t1
 JOIN
@@ -1178,8 +1169,10 @@ WHERE ex_PatientID IN (
 	WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients))) t2
 ON t1.pID4 = t2.ex_PatientID
 ALTER TABLE #chemoCycleTable_Ov_notime DROP COLUMN pID4, ex_PatientID
+-- ** The following delete statement is needed to fix an error in the data where expDurationOfCycle 
+-- ** for a non-"BLOOD (C)" regLabel is coded as 1.
+DELETE #chemoCycleTable_Ov_notime WHERE expDurationOfCycle = 1
 --SELECT * FROM #chemoCycleTable_Ov_notime ORDER BY chemPID4, regimenID4, cycleNum4
-
 
 -- ** PPMQuery.leeds.ChemoRegimens **
 -- ** This fifth table has the dated chemoRegimens data - regStartDate. **
@@ -1212,10 +1205,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID5 = t2.pID
 ORDER BY pID, regStartDate DESC
-
 IF OBJECT_ID ('tempdb..#chemoRegimenTable_Ov_chemR_time1') IS NOT NULL
 	DROP TABLE #chemoRegimenTable_Ov_chemR_time1
-SELECT * INTO #chemoRegimenTable_Ov_chemR_time1
+SELECT DISTINCT * INTO #chemoRegimenTable_Ov_chemR_time1
 FROM
 (SELECT * FROM #chemoRegimenTable_Ov_chemR_time1_pre) t1
 JOIN
@@ -1260,10 +1252,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID6 = t2.pID
 ORDER BY pID, regEndDate DESC
-
 IF OBJECT_ID ('tempdb..#chemoRegimenTable_Ov_chemR_time2') IS NOT NULL
 	DROP TABLE #chemoRegimenTable_Ov_chemR_time2
-SELECT * INTO #chemoRegimenTable_Ov_chemR_time2
+SELECT DISTINCT * INTO #chemoRegimenTable_Ov_chemR_time2
 FROM
 (SELECT * FROM #chemoRegimenTable_Ov_chemR_time2_pre) t1
 JOIN
@@ -1308,10 +1299,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID7 = t2.pID
 ORDER BY pID, regDecisionDate DESC
-
 IF OBJECT_ID ('tempdb..#chemoRegimenTable_Ov_chemR_time3') IS NOT NULL
 	DROP TABLE #chemoRegimenTable_Ov_chemR_time3
-SELECT * INTO #chemoRegimenTable_Ov_chemR_time3
+SELECT DISTINCT * INTO #chemoRegimenTable_Ov_chemR_time3
 FROM
 (SELECT * FROM #chemoRegimenTable_Ov_chemR_time3_pre) t1
 JOIN
@@ -1361,10 +1351,9 @@ FROM PPMQuery.leeds.Diagnosis
 WHERE dx_PatientID IN (SELECT * FROM #OvarianPatients)) t2
 ON t1.pID8 = t2.pID
 ORDER BY pID DESC
-
 IF OBJECT_ID ('tempdb..#chemoRegimenTable_Ov_chemR_notime') IS NOT NULL
 	DROP TABLE #chemoRegimenTable_Ov_chemR_notime
-SELECT * INTO #chemoRegimenTable_Ov_chemR_notime
+SELECT DISTINCT * INTO #chemoRegimenTable_Ov_chemR_notime
 FROM
 (SELECT * FROM #chemoRegimenTable_Ov_chemR_notime_pre) t1
 JOIN
@@ -1382,178 +1371,109 @@ ALTER TABLE #chemoRegimenTable_Ov_chemR_notime DROP COLUMN pID8, ex_PatientID
 -- ** The next step is to join the non-dated data from all chemotherapy tables to  
 -- ** each of the dated tables.
 --
--- ** #chemoDrugsTable_Ov_chemD_time1 to become #chemoTable1_Ov
-IF OBJECT_ID ('tempdb..#chemoTable1_Ov') IS NOT NULL
-	DROP TABLE #chemoTable1_Ov
-SELECT DISTINCT * INTO #chemoTable1_Ov
+-- ** The first sub-step is to create a unique, amalgumated list of pID, regimen
+-- ** ID and cycle number. This forms the spine onto which the other previous
+-- ** tables are joined.
+IF OBJECT_ID ('tempdb..#chemoTable_spine') IS NOT NULL DROP TABLE #chemoTable_spine
+SELECT DISTINCT * INTO #chemoTable_spine
 FROM
 	(
-	SELECT chemPID1 AS chemPID,
-			regimenID1 AS regimenID,
-			cycleNum1 AS cycleNum,
-			* FROM #chemoDrugsTable_Ov_chemD_time1
-	) AS t1
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoDrugsTable_Ov_chemD_notime
-	) AS t2
-ON t1.chemPID1 = t2.chemPID3
-	AND t1.regimenID1 = t2.regimenID3
-	AND t1.cycleNum1 = t2.cycleNum3
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoCycleTable_Ov_notime
-	) AS t3
-ON t1.chemPID1 = t3.chemPID4
-	AND t1.regimenID1 = t3.regimenID4
-	AND t1.cycleNum1 = t3.cycleNum4
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoRegimenTable_Ov_chemR_notime
-	) AS t4
-ON t1.chemPID1 = t4.chemPID8
-	AND t1.regimenID1 = t4.regimenID8
+	SELECT chemPID1 AS chemPID,	regimenID1 AS regimenID, cycleNum1 AS cycleNum FROM #chemoDrugsTable_Ov_chemD_time1
+	UNION
+	SELECT chemPID2 AS chemPID,	regimenID2 AS regimenID, cycleNum2 AS cycleNum FROM #chemoDrugsTable_Ov_chemD_time2
+	UNION
+	SELECT chemPID3 AS chemPID,	regimenID3 AS regimenID, cycleNum3 AS cycleNum FROM #chemoDrugsTable_Ov_chemD_notime
+	UNION
+	SELECT chemPID4 AS chemPID,	regimenID4 AS regimenID, cycleNum4 AS cycleNum FROM #chemoCycleTable_Ov_notime
+	UNION
+	SELECT chemPID5 AS chemPID,	regimenID5 AS regimenID, NULL AS cycleNum FROM #chemoRegimenTable_Ov_chemR_time1
+	UNION
+	SELECT chemPID6 AS chemPID,	regimenID6 AS regimenID, NULL AS cycleNum FROM #chemoRegimenTable_Ov_chemR_time2
+	UNION
+	SELECT chemPID7 AS chemPID,	regimenID7 AS regimenID, NULL AS cycleNum FROM #chemoRegimenTable_Ov_chemR_time3
+	UNION
+	SELECT chemPID8 AS chemPID,	regimenID8 AS regimenID, NULL AS cycleNum FROM #chemoRegimenTable_Ov_chemR_notime
+	) t1
+WHERE regimenID IS NOT NULL AND cycleNum IS NOT NULL
+ORDER BY chemPID, regimenID, cycleNum
+-- ** #chemoDrugsTable_Ov_chemD_time1 to become #chemoTable1_Ov
+IF OBJECT_ID ('tempdb..#chemoTable1_Ov') IS NOT NULL DROP TABLE #chemoTable1_Ov
+SELECT DISTINCT * INTO #chemoTable1_Ov
+FROM #chemoTable_spine AS tt
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_time1 AS t1
+ON tt.chemPID = t1.chemPID1 AND tt.regimenID = t1.regimenID1 AND tt.cycleNum = t1.cycleNum1
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_notime AS t2
+ON tt.chemPID = t2.chemPID3 AND tt.regimenID = t2.regimenID3 AND tt.cycleNum = t2.cycleNum3
+LEFT OUTER JOIN #chemoCycleTable_Ov_notime AS t3
+ON tt.chemPID = t3.chemPID4 AND tt.regimenID = t3.regimenID4 AND tt.cycleNum = t3.cycleNum4
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_notime AS t4
+ON tt.chemPID = t4.chemPID8 AND tt.regimenID = t4.regimenID8
 ALTER TABLE #chemoTable1_Ov DROP COLUMN chemPID1, chemPID3, chemPID4, chemPID8,
 										regimenID1, regimenID3, regimenID4, regimenID8,
-										cycleNum1, cycleNum3, cycleNum4							
+										cycleNum1, cycleNum3, cycleNum4
 -- ** #chemoDrugsTable_Ov_chemD_time2 to become #chemoTable2_Ov
-IF OBJECT_ID ('tempdb..#chemoTable2_Ov') IS NOT NULL
-	DROP TABLE #chemoTable2_Ov
+IF OBJECT_ID ('tempdb..#chemoTable2_Ov') IS NOT NULL DROP TABLE #chemoTable2_Ov
 SELECT DISTINCT * INTO #chemoTable2_Ov
-FROM
-	(
-	SELECT chemPID2 AS chemPID,
-			regimenID2 AS regimenID,
-			cycleNum2 AS cycleNum,
-			* FROM #chemoDrugsTable_Ov_chemD_time2
-	) AS t1
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoDrugsTable_Ov_chemD_notime
-	) AS t2
-ON t1.chemPID2 = t2.chemPID3
-	AND t1.regimenID2 = t2.regimenID3
-	AND t1.cycleNum2 = t2.cycleNum3
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoCycleTable_Ov_notime
-	) AS t3
-ON t1.chemPID2 = t3.chemPID4
-	AND t1.regimenID2 = t3.regimenID4
-	AND t1.cycleNum2 = t3.cycleNum4
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoRegimenTable_Ov_chemR_notime
-	) AS t4
-ON t1.chemPID2 = t4.chemPID8
-	AND t1.regimenID2 = t4.regimenID8
+FROM #chemoTable_spine AS tt
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_time2 AS t1
+ON tt.chemPID = t1.chemPID2 AND tt.regimenID = t1.regimenID2 AND tt.cycleNum = t1.cycleNum2
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_notime AS t2
+ON t1.chemPID2 = t2.chemPID3 AND t1.regimenID2 = t2.regimenID3 AND t1.cycleNum2 = t2.cycleNum3
+LEFT OUTER JOIN #chemoCycleTable_Ov_notime AS t3
+ON t1.chemPID2 = t3.chemPID4 AND t1.regimenID2 = t3.regimenID4 AND t1.cycleNum2 = t3.cycleNum4
+LEFT OUTER JOIN	#chemoRegimenTable_Ov_chemR_notime AS t4
+ON t1.chemPID2 = t4.chemPID8 AND t1.regimenID2 = t4.regimenID8
 ALTER TABLE #chemoTable2_Ov DROP COLUMN chemPID2, chemPID3, chemPID4, chemPID8,
 										regimenID2, regimenID3, regimenID4, regimenID8,
 										cycleNum2, cycleNum3, cycleNum4
 -- ** #chemoRegimenTable_Ov_chemR_time1 to become #chemoTable3_Ov
-IF OBJECT_ID ('tempdb..#chemoTable3_Ov') IS NOT NULL
-	DROP TABLE #chemoTable3_Ov
+IF OBJECT_ID ('tempdb..#chemoTable3_Ov') IS NOT NULL DROP TABLE #chemoTable3_Ov
 SELECT DISTINCT * INTO #chemoTable3_Ov
-FROM
-	(
-	SELECT chemPID5 AS chemPID,
-			regimenID5 AS regimenID,
-			* FROM #chemoRegimenTable_Ov_chemR_time1
-	) AS t1
-LEFT OUTER JOIN
-	(
-	SELECT cycleNum3 AS cycleNUM, * FROM #chemoDrugsTable_Ov_chemD_notime
-	) AS t2
-ON t1.chemPID5 = t2.chemPID3
-	AND t1.regimenID5 = t2.regimenID3
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoCycleTable_Ov_notime
-	) AS t3
-ON t1.chemPID5 = t3.chemPID4
-	AND t1.regimenID5 = t3.regimenID4
-	AND t2.cycleNum3 = t3.cycleNum4
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoRegimenTable_Ov_chemR_notime
-	) AS t4
-ON t1.chemPID5 = t4.chemPID8
-	AND t1.regimenID5 = t4.regimenID8
-ORDER BY chemPID, regimenID3, cycleNum3, regStartDate
+FROM #chemoTable_spine AS tt
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_time1 AS t1
+ON tt.chemPID = t1.chemPID5 AND tt.regimenID = t1.regimenID5
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_notime AS t2
+ON t1.chemPID5 = t2.chemPID3 AND t1.regimenID5 = t2.regimenID3 AND tt.cycleNum = t2.cycleNum3
+LEFT OUTER JOIN #chemoCycleTable_Ov_notime AS t3
+ON t1.chemPID5 = t3.chemPID4 AND t1.regimenID5 = t3.regimenID4 AND tt.cycleNum = t3.cycleNum4
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_notime AS t4
+ON t1.chemPID5 = t4.chemPID8 AND t1.regimenID5 = t4.regimenID8
 ALTER TABLE #chemoTable3_Ov DROP COLUMN chemPID5, chemPID3, chemPID4, chemPID8,
 										regimenID5, regimenID3, regimenID4, regimenID8,
 										cycleNum3, cycleNum4
 -- ** #chemoRegimenTable_Ov_chemR_time2 to become #chemoTable4_Ov
-IF OBJECT_ID ('tempdb..#chemoTable4_Ov') IS NOT NULL
-	DROP TABLE #chemoTable4_Ov
+IF OBJECT_ID ('tempdb..#chemoTable4_Ov') IS NOT NULL DROP TABLE #chemoTable4_Ov
 SELECT DISTINCT * INTO #chemoTable4_Ov
-FROM
-	(
-	SELECT chemPID6 AS chemPID,
-			regimenID6 AS regimenID,
-			* FROM #chemoRegimenTable_Ov_chemR_time2
-	) AS t1
-LEFT OUTER JOIN
-	(
-	SELECT cycleNum3 AS cycleNUM, * FROM #chemoDrugsTable_Ov_chemD_notime
-	) AS t2
-ON t1.chemPID6 = t2.chemPID3
-	AND t1.regimenID6 = t2.regimenID3
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoCycleTable_Ov_notime
-	) AS t3
-ON t1.chemPID6 = t3.chemPID4
-	AND t1.regimenID6 = t3.regimenID4
-	AND t2.cycleNum3 = t3.cycleNum4
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoRegimenTable_Ov_chemR_notime
-	) AS t4
-ON t1.chemPID6 = t4.chemPID8
-	AND t1.regimenID6 = t4.regimenID8
-ORDER BY chemPID, regimenID3, cycleNum3, regEndDate
+FROM #chemoTable_spine AS tt
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_time2 AS t1
+ON tt.chemPID = t1.chemPID6 AND tt.regimenID = t1.regimenID6
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_notime AS t2
+ON t1.chemPID6 = t2.chemPID3 AND t1.regimenID6 = t2.regimenID3 AND tt.cycleNum = t2.cycleNum3
+LEFT OUTER JOIN  #chemoCycleTable_Ov_notime AS t3
+ON t1.chemPID6 = t3.chemPID4 AND t1.regimenID6 = t3.regimenID4 AND tt.cycleNum = t3.cycleNum4
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_notime AS t4
+ON t1.chemPID6 = t4.chemPID8 AND t1.regimenID6 = t4.regimenID8
 ALTER TABLE #chemoTable4_Ov DROP COLUMN chemPID6, chemPID3, chemPID4, chemPID8,
 										regimenID6, regimenID3, regimenID4, regimenID8,
-										cycleNum3, cycleNum4
+										cycleNum3, cycleNum4			
 -- ** #chemoRegimenTable_Ov_chemR_time3 to become #chemoTable5_Ov
-IF OBJECT_ID ('tempdb..#chemoTable5_Ov') IS NOT NULL
-	DROP TABLE #chemoTable5_Ov
+IF OBJECT_ID ('tempdb..#chemoTable5_Ov') IS NOT NULL DROP TABLE #chemoTable5_Ov
 SELECT DISTINCT * INTO #chemoTable5_Ov
-FROM
-	(
-	SELECT chemPID7 AS chemPID,
-			regimenID7 AS regimenID,
-			* FROM #chemoRegimenTable_Ov_chemR_time3
-	) AS t1
-LEFT OUTER JOIN
-	(
-	SELECT cycleNum3 AS cycleNUM, * FROM #chemoDrugsTable_Ov_chemD_notime
-	) AS t2
-ON t1.chemPID7 = t2.chemPID3
-	AND t1.regimenID7 = t2.regimenID3
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoCycleTable_Ov_notime
-	) AS t3
-ON t1.chemPID7 = t3.chemPID4
-	AND t1.regimenID7 = t3.regimenID4
-	AND t2.cycleNum3 = t3.cycleNum4
-LEFT OUTER JOIN
-	(
-	SELECT * FROM #chemoRegimenTable_Ov_chemR_notime
-	) AS t4
-ON t1.chemPID7 = t4.chemPID8
-	AND t1.regimenID7 = t4.regimenID8
-ORDER BY chemPID, regimenID3, cycleNum3, regDecisionDate
+FROM #chemoTable_spine AS tt
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_time3 AS t1
+ON tt.chemPID = t1.chemPID7 AND tt.regimenID = t1.regimenID7
+LEFT OUTER JOIN #chemoDrugsTable_Ov_chemD_notime AS t2
+ON t1.chemPID7 = t2.chemPID3 AND t1.regimenID7 = t2.regimenID3 AND tt.cycleNum = t2.cycleNum3
+LEFT OUTER JOIN #chemoCycleTable_Ov_notime AS t3
+ON t1.chemPID7 = t3.chemPID4 AND t1.regimenID7 = t3.regimenID4 AND tt.cycleNum = t3.cycleNum4
+LEFT OUTER JOIN #chemoRegimenTable_Ov_chemR_notime AS t4
+ON t1.chemPID7 = t4.chemPID8 AND t1.regimenID7 = t4.regimenID8
 ALTER TABLE #chemoTable5_Ov DROP COLUMN chemPID7, chemPID3, chemPID4, chemPID8,
 										regimenID7, regimenID3, regimenID4, regimenID8,
 										cycleNum3, cycleNum4
 
 -- ** The final step is to union everything.
---
-IF OBJECT_ID ('tempdb..#chemoTable_Ov') IS NOT NULL
-	DROP TABLE #chemoTable_Ov
+IF OBJECT_ID ('tempdb..#chemoTable_Ov') IS NOT NULL DROP TABLE #chemoTable_Ov
 SELECT DISTINCT * INTO #chemoTable_Ov
 FROM
 	(
@@ -1583,7 +1503,6 @@ FROM
 			drugFreq,
 			drugConsultantSpeciality_drug,
 			chemSurvStatus,
-			chemSurvTime,
 			cycleActionStatus,
 			regOutcome,
 			regLabel,
@@ -1619,7 +1538,6 @@ FROM
 			drugFreq,
 			drugConsultantSpeciality_drug,
 			chemSurvStatus,
-			chemSurvTime,
 			cycleActionStatus,
 			regOutcome,
 			regLabel,
@@ -1655,7 +1573,6 @@ FROM
 			drugFreq,
 			drugConsultantSpeciality_drug,
 			chemSurvStatus,
-			chemSurvTime,
 			cycleActionStatus,
 			regOutcome,
 			regLabel,
@@ -1691,7 +1608,6 @@ FROM
 			drugFreq,
 			drugConsultantSpeciality_drug,
 			chemSurvStatus,
-			chemSurvTime,
 			cycleActionStatus,
 			regOutcome,
 			regLabel,
@@ -1727,7 +1643,6 @@ FROM
 			drugFreq,
 			drugConsultantSpeciality_drug,
 			chemSurvStatus,
-			chemSurvTime,
 			cycleActionStatus,
 			regOutcome,
 			regLabel,
@@ -1737,8 +1652,13 @@ FROM
 			trialYesNo
 			FROM #chemoTable5_Ov
 	) AS t1
+WHERE regimenDrugLabel NOT LIKE 'AGH%' AND regLabel NOT LIKE 'AGH%' AND regLabel NOT LIKE '%OPMAS%' -- ** These exclusions come from two places.
+																									-- ** The OPMAS exlcusino comes from MT. He 
+																									-- ** said OPMAS is an old system and does 
+																									-- ** not have reliable reliable information.
+																									-- ** The AGH exclusion is from GH who says
+																									-- ** it refers to treatment in Airedale.
 --SELECT * FROM #chemoTable_Ov ORDER BY chemPID, regimenID, cycleNum, regStartDate, cycleStartDate, drugStartDate, regEndDate, regDecisionDate
-
 end
 
 begin -- ** PPMQuery.leeds.Surgery & PPMQuery.leeds.Pathology **
@@ -2538,11 +2458,10 @@ end --
 -- ** Combines all temp tables into one with a continuous time column.
 -- *******************************************************************
 begin --
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre') IS NOT NULL DROP TABLE #combinedTable_Ov_pre
 SELECT DISTINCT * INTO #combinedTable_Ov_pre
 FROM(
-	SELECT --unionID,
+	SELECT unionID,
 			unionTimeStamp AS ts,
 			unionPID AS pID,
 			unionSurvStatus,
@@ -2717,15 +2636,15 @@ FROM(
 																UNION ALL
 																SELECT radxIDkey unionID, radxpID unionPID, radioEndDate unionTimeStamp, NULL AS unionSurvStatus, NULL AS unionSurvTime, NULL AS unionConsultantSpeciality FROM #radioExTable_Ov WHERE radioEndDate IS NOT NULL
 																UNION ALL
-																SELECT chemIDkey unionID, chemPID unionPID, cycleStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, chemSurvTime unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE cycleStartDate IS NOT NULL
+																SELECT chemIDkey unionID, chemPID unionPID, cycleStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, NULL AS unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE cycleStartDate IS NOT NULL
 																UNION ALL
-																SELECT chemIDkey unionID, chemPID unionPID, drugStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, chemSurvTime unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE drugStartDate IS NOT NULL
+																SELECT chemIDkey unionID, chemPID unionPID, drugStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, NULL AS unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE drugStartDate IS NOT NULL
 																UNION ALL
-																SELECT chemIDkey unionID, chemPID unionPID, regStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, chemSurvTime unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regStartDate IS NOT NULL
+																SELECT chemIDkey unionID, chemPID unionPID, regStartDate unionTimeStamp, chemSurvStatus unionSurvStatus, NULL AS unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regStartDate IS NOT NULL
 																UNION ALL
-																SELECT chemIDkey unionID, chemPID unionPID, regEndDate unionTimeStamp, chemSurvStatus unionSurvStatus, chemSurvTime unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regEndDate IS NOT NULL
+																SELECT chemIDkey unionID, chemPID unionPID, regEndDate unionTimeStamp, chemSurvStatus unionSurvStatus, NULL AS unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regEndDate IS NOT NULL
 																UNION ALL
-																SELECT chemIDkey unionID, chemPID unionPID, regDecisionDate unionTimeStamp, chemSurvStatus unionSurvStatus, chemSurvTime unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regDecisionDate IS NOT NULL
+																SELECT chemIDkey unionID, chemPID unionPID, regDecisionDate unionTimeStamp, chemSurvStatus unionSurvStatus, NULL AS unionSurvTime, drugConsultantSpeciality_drug unionConsultantSpeciality FROM #chemoTable_Ov WHERE regDecisionDate IS NOT NULL
 																UNION ALL
 																SELECT surgIDkey unionID, surgpID unionPID, surgeryDate unionTimeStamp, surgSurvStatus unionSurvStatus, surgSurvTime unionSurvTime, surgConsultantSpeciality AS unionConsultantSpeciality FROM #surgTable_Ov WHERE surgeryDate IS NOT NULL
 																UNION ALL
@@ -2797,8 +2716,7 @@ FROM(
 		) t15
 	) tt
 -- ** Add any validated worsening events for which there are no PPM events.
-IF OBJECT_ID ('tempdb..#addOnTable') IS NOT NULL
-	DROP TABLE #addOnTable
+IF OBJECT_ID ('tempdb..#addOnTable') IS NOT NULL DROP TABLE #addOnTable
 SELECT * INTO #addOnTable
 FROM 
 	(
@@ -2849,8 +2767,7 @@ DELETE FROM #combinedTable_Ov_pre WHERE pID IS NULL AND ts IS NULL
 UPDATE #combinedTable_Ov_pre SET operationReason = replace(operationReason, char(13) + char(10), ' ')
 
 -- ** Add a column that keeps track of the age band at every event date.
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre2') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre2
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre2') IS NOT NULL DROP TABLE #combinedTable_Ov_pre2
 SELECT * INTO #combinedTable_Ov_pre2
 FROM
 	(
@@ -2873,16 +2790,15 @@ FROM
 		ageBandAtWardStartDate,
 		ageBandAtWardEndDate,
 		ageBandAtRadioEventDate,
-		--ageBandAtRadioStartDate,
-		--ageBandAtRadioEndDate,
+		ageBandAtRadioStartDate,
+		ageBandAtRadioEndDate,
 		ageBandAtCycleStartDate,
 		ageBandAtDrugStartDate,
 		ageBandAtRegStartDate,
 		ageBandAtRegEndDate,
 		ageBandAtRegDecisionDate,
 		ageBandAtSurgeryDate,
-		--ageBandAtInvestigationDate,
-		--ageBandAtEventDate,
+		ageBandAtInvestigationDate,
 		ageBandAtDiagnosisDate,
 		ageBandAtDeathDate,
 		ageBandAtMDTrevDate,
@@ -2900,16 +2816,15 @@ FROM
 								ageBandAtWardStartDate,
 								ageBandAtWardEndDate,
 								ageBandAtRadioEventDate,
-								--ageBandAtRadioStartDate,
-								--ageBandAtRadioEndDate,
+								ageBandAtRadioStartDate,
+								ageBandAtRadioEndDate,
 								ageBandAtCycleStartDate,
 								ageBandAtDrugStartDate,
 								ageBandAtRegStartDate,
 								ageBandAtRegEndDate,
 								ageBandAtRegDecisionDate,
 								ageBandAtSurgeryDate,
-								--ageBandAtInvestigationDate,
-								--ageBandAtEventDate,
+								ageBandAtInvestigationDate,
 								ageBandAtDiagnosisDate,
 								ageBandAtDeathDate,
 								ageBandAtMDTrevDate,
@@ -2926,8 +2841,7 @@ ALTER TABLE #combinedTable_Ov_pre2 DROP COLUMN pIDremove, TSremove
 -- ** negative values before. There are some extreme cases of chemo
 -- ** events occurring 10 years previous to the diagnosis of interest,
 -- ** suggesting that the cancer of interest is not the first cancer.
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre3') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre3
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre3') IS NOT NULL DROP TABLE #combinedTable_Ov_pre3
 SELECT * INTO #combinedTable_Ov_pre3
 FROM
 	(
@@ -2949,8 +2863,7 @@ ORDER BY pID, ts
 ALTER TABLE #combinedTable_Ov_pre3 DROP COLUMN pID2remove, DxDate
 
 -- ** Add the demographic data and a row ID for each record.
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre4') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre4
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre4') IS NOT NULL DROP TABLE #combinedTable_Ov_pre4
 SELECT newid() rowID, * INTO #combinedTable_Ov_pre4
 FROM
 	(
@@ -2968,10 +2881,8 @@ ALTER TABLE #combinedTable_Ov_pre4 DROP COLUMN patiIDkey, patipID
 -- ** This section defines the boundaries of radiotherapy. The 
 -- ** logic considers radioStartDate, radioEndDate and radioEventDate
 -- ** to figure out what duration the radiological treatment covers.
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre5') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre5
-IF OBJECT_ID ('tempdb..#TreatmentBlockDates_radio') IS NOT NULL
-	DROP TABLE #TreatmentBlockDates_radio
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre5') IS NOT NULL DROP TABLE #combinedTable_Ov_pre5
+IF OBJECT_ID ('tempdb..#TreatmentBlockDates_radio') IS NOT NULL DROP TABLE #TreatmentBlockDates_radio
 SELECT pID7, radioTreatmentStart, radioTreatmentEnd INTO #TreatmentBlockDates_radio
 FROM
 	(
@@ -3079,10 +2990,8 @@ UPDATE #combinedTable_Ov_pre5 SET treatmentBlock_radio = 0 WHERE treatmentBlock_
 -- ** This section defines the boundaries of chemotherapy. The logic
 -- ** considers all chemotherapy related dates to figure out what 
 -- ** duration the chemotherapy covers.
-IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre6') IS NOT NULL
-	DROP TABLE #combinedTable_Ov_pre6
-IF OBJECT_ID ('tempdb..#TreatmentBlockDates_chemo') IS NOT NULL
-	DROP TABLE #TreatmentBlockDates_chemo
+IF OBJECT_ID ('tempdb..#combinedTable_Ov_pre6') IS NOT NULL DROP TABLE #combinedTable_Ov_pre6
+IF OBJECT_ID ('tempdb..#TreatmentBlockDates_chemo') IS NOT NULL DROP TABLE #TreatmentBlockDates_chemo
 SELECT pID7, chemoTreatmentStart, chemoTreatmentEnd INTO #TreatmentBlockDates_chemo
 FROM
 (
@@ -3205,9 +3114,8 @@ ALTER TABLE #combinedTable_Ov_pre6 DROP COLUMN rowID8
 UPDATE #combinedTable_Ov_pre6 SET treatmentBlock_chemo = 0 WHERE treatmentBlock_chemo IS NULL
 
 end --
-
 -- Show final output.
-SELECT * FROM #combinedTable_Ov_pre6 ORDER BY pID, ts
+--SELECT * FROM #combinedTable_Ov_pre6 ORDER BY pID, ts
 
 -- *******************************************************************
 -- ** Create the final flat tables. **
@@ -3232,10 +3140,8 @@ SELECT * INTO recurrences_Ov FROM #recurrences_Ov
 SELECT * INTO TreatmentBlockDates_radio FROM #TreatmentBlockDates_radio
 SELECT * INTO TreatmentBlockDates_chemo FROM #TreatmentBlockDates_chemo
 SELECT * INTO combinedTable_Ov FROM #combinedTable_Ov_pre6
-
+SELECT * INTO #combinedTable_Ov FROM #combinedTable_Ov_pre6
 end --
-
-
 
 
 END
