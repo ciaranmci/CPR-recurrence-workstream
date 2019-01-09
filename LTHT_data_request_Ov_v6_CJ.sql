@@ -3138,8 +3138,8 @@ SELECT * INTO MDTrevTable_Ov FROM #MDTrevTable_Ov
 SELECT * INTO deathDate_Ov FROM #deathDate_Ov
 SELECT * INTO oneColWorsening_Ov FROM #oneColWorsening_Ov
 SELECT * INTO recurrences_Ov FROM #recurrences_Ov
-SELECT * INTO TreatmentBlockDates_radio FROM #TreatmentBlockDates_radio
-SELECT * INTO TreatmentBlockDates_chemo FROM #TreatmentBlockDates_chemo
+SELECT * INTO TreatmentBlockDates_radio_Ov FROM #TreatmentBlockDates_radio
+SELECT * INTO TreatmentBlockDates_chemo_Ov FROM #TreatmentBlockDates_chemo
 SELECT * INTO combinedTable_Ov FROM #combinedTable_Ov_pre6
 end --
 

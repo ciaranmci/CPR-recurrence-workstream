@@ -3133,8 +3133,8 @@ SELECT * INTO MDTrevTable_Br FROM #MDTrevTable_Br
 SELECT * INTO deathDate_Br FROM #deathDate_Br
 SELECT * INTO oneColWorsening_Br FROM #oneColWorsening_Br
 SELECT * INTO recurrences_Br FROM #recurrences_Br
-SELECT * INTO TreatmentBlockDates_radio FROM #TreatmentBlockDates_radio
-SELECT * INTO TreatmentBlockDates_chemo FROM #TreatmentBlockDates_chemo
+SELECT * INTO TreatmentBlockDates_radio_Br FROM #TreatmentBlockDates_radio
+SELECT * INTO TreatmentBlockDates_chemo_Br FROM #TreatmentBlockDates_chemo
 SELECT * INTO combinedTable_Br FROM #combinedTable_Br_pre6
 end --
 
