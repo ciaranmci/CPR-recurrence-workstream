@@ -72,7 +72,7 @@ SELECT * INTO #consultTable_CR
 FROM
 (SELECT * FROM #consultTable_CR_pre) t3
 JOIN
-(SELECT DISTINCT *-- ex_CodedIdentifier conspID, ex_PatientID
+(SELECT DISTINCT ex_CodedIdentifier conspID, ex_PatientID
 FROM ACNRes.dbo.sdt_RP_BR_CR_OV_COMBINED_FLAT_TABLE_2013_FINAL
 WHERE ex_PatientID IN (
 	SELECT DISTINCT dx_PatientID pID
